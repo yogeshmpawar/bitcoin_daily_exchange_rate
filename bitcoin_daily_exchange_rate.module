@@ -15,10 +15,10 @@ function bitcoin_daily_exchange_rate_help($path) {
     $output = '';
     $output .= '<h3>' . t('About') . '</h3>';
     $output .= '<dd>';
-    $output .=  t('The Bitcoin Daily Exchange Rate module sync the daily bitcoin rate with bitcoin daily content type');
+    $output .=  t('The Bitcoin Daily Exchange Rate module sync the daily bitcoin rate with bitcoin daily content type.');
     $output .= '<br />' . t('API Endpoint to sync the bitcoin USD rate: <a href="@url" target="_blank">API Endpoint</a>', ['@url' => 'https://api.coindesk.com/v1/bpi/currentprice.json']);
-    $output .= '<br />' . t('When new bitcoin daily content created we sync the current bitcoin usd rate into Todays Bitcoin Rate in USD field');
-    $output .= '<br />' . t('We are using hook_node_presave() hook to get current bitcoin usd rate & saving to Todays Bitcoin Rate in USD field');
+    $output .= '<br />' . t('When new bitcoin daily content created we sync the current bitcoin usd rate into Todays Bitcoin Rate in USD field.');
+    $output .= '<br />' . t('We are using hook_node_presave() hook to get current bitcoin usd rate & saving to Todays Bitcoin Rate in USD field.');
     $output .= '</dd>';
     return $output;
   }
