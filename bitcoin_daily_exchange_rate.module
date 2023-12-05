@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Module for Bitcoin Daily Exchange Rate.
+ */
+
+include_once 'bitcoin_daily_exchange_rate.features.inc';
+
+/**
+ * Implements hook_help().
+ */
+function bitcoin_daily_exchange_rate_help($path) {
+  if ($path == 'admin/help#bitcoin_daily_exchange_rate') {
+    $output = '';
+    $output .= '<h3>' . t('About') . '</h3>';
+    $output .= '<dd>';
+    $output .=  t('The Bitcoin Daily Exchange Rate module sync the daily bitcoin rate with bitcoin daily content type');
+    $output .= '<br />' . t('API Endpoint to sync the bitcoin USD rate: <a href="@url" target="_blank">API Endpoint</a>', ['@url' => 'https://api.coindesk.com/v1/bpi/currentprice.json']);
+    $output .= '<br />' . t('When new bitcoin daily content created we sync the current bitcoin usd rate into Todays Bitcoin Rate in USD field');
+    $output .= '<br />' . t('We are using hook_node_presave() hook to get current bitcoin usd rate & saving to Todays Bitcoin Rate in USD field');
+    $output .= '</dd>';
+    return $output;
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ *
+ * Sync current Bitcoin daily exchange rate with field_bitcoin_usd_rate field.
+ */
+public function bitcoin_daily_exchange_rate_node_presave($node) {
+  // Check if the node is of type 'bitcoin_daily' and if bitcoin value is empty.
+  if (!empty($node->is_new) && $node->type == 'bitcoin_daily' && empty($node->field_bitcoin_usd_rate[LANGUAGE_NONE])) {
+    // Getting the current bitcoin usd rate.
+    $bitcoin_usd_rate = bitcoin_daily_exchange_rate_get_usd_price();
+    // Checking the $bitcoin_usd_rate is not FALSE.
+    if ($bitcoin_usd_rate !== FALSE) {
+      // Setting up "Todays Bitcoin Rate in USD" field.
+      $node->field_bitcoin_usd_rate[LANGUAGE_NONE][0]['value'] = $bitcoin_usd_rate;
+    }
+  }
+}
+
+/**
+ * Function to get the Bitcoin USD price.
+ */
+public function bitcoin_daily_exchange_rate_get_usd_price() {
+  // API Endpoint yo fetch the bitcoin usd rate.
+  $url = 'https://api.coindesk.com/v1/bpi/currentprice.json';
+  // Response from the API Endpoint.
+  $response = drupal_http_request($url);
+  // Checking response code from API Endpoint.
+  if ($response->code == 200) {
+    // Decoding the JSON response data from API Endpoint.
+    $data = json_decode($response->data);
+    // Returning the bitcoin USD rate.
+    return $data->bpi->USD->rate_float;
+  }
+  else {
+    $error = $response->data ?? ($response->error ?? '');
+    // Logging error to watchdog.
+    watchdog('bitcoin_daily_exchange_rate', 'Error Fetching the bitcoin usd rate - %error.', array('%error' => $error), WATCHDOG_ERROR);
+  }
+  return FALSE;
+}
