@@ -29,7 +29,7 @@ function bitcoin_daily_exchange_rate_help($path) {
  *
  * Sync current Bitcoin daily exchange rate with field_bitcoin_usd_rate field.
  */
-public function bitcoin_daily_exchange_rate_node_presave($node) {
+function bitcoin_daily_exchange_rate_node_presave($node) {
   // Check if the node is of type 'bitcoin_daily' and if bitcoin value is empty.
   if (!empty($node->is_new) && $node->type == 'bitcoin_daily' && empty($node->field_bitcoin_usd_rate[LANGUAGE_NONE])) {
     // Getting the current bitcoin usd rate.
@@ -45,7 +45,7 @@ public function bitcoin_daily_exchange_rate_node_presave($node) {
 /**
  * Function to get the Bitcoin USD price.
  */
-public function bitcoin_daily_exchange_rate_get_usd_price() {
+function bitcoin_daily_exchange_rate_get_usd_price() {
   // API Endpoint yo fetch the bitcoin usd rate.
   $url = 'https://api.coindesk.com/v1/bpi/currentprice.json';
   // Response from the API Endpoint.
